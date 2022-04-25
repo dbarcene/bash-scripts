@@ -1,0 +1,20 @@
+#!/bin/bash 
+# File              : getbib
+# Author            : David Barcene <david.barcene@utp.ac.pa>
+# Date              : 01.03.2022
+# Last Modified Date: 24.04.2022
+# Last Modified By  : David Barcene <david.barcene@utp.ac.pa>
+
+[ -z "$1" ] && echo "Usage: getbib [pdf] or getbib [doi]" && exit
+
+if [ -f "$1" ]; then
+	doi=$(pdfinfo "$1" | grep -io "doi:.*") ||
+	doi=$(pdftotext "$1" 2>/dev/null - | grep -io "doi.*" -m 1 | sed "s/^..../doi:/") ||
+	exit 1
+else
+	doi="$1"
+fi
+
+# Check crossref.org for bibtex citation
+curl
+"http://api.crossref.org/works?filter=has-full-text:true&mailto=david.barcene@utp.ac.pa/$doi/transform/application/x-bibtex" -w "\\n"
