@@ -5,6 +5,12 @@
 # Last Modified Date: 24.04.2022
 # Last Modified By  : David Barcene <david.barcene@utp.ac.pa>
 
+# Based on nixcasts youtube video Writing academic papers on the command 
+# line with pandoc, and Luke Smith script getbib, but added the rules of
+# politeness from https://api.crossref.org/swagger-ui/index.html
+# Change User-Agent info  with your own before using it.
+# Copy this file into your ~/.local/bin/
+
 [ -z "$1" ] && echo "Usage: getbib [pdf] or getbib [doi]" && exit
 
 if [ -f "$1" ]; then
