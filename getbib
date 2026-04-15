@@ -38,4 +38,4 @@ formatted="${output#?}"
 formatted="${formatted//,/,$'\n\t'}"
 formatted="${formatted%\}*}"$'\n}'
 
-echo "$formatted"
+echo "$formatted" | tee $BIB_PATH
