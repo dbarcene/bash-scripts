@@ -11,11 +11,16 @@
 # Change User-Agent info  with your own before using it.
 # Copy this file into your ~/.local/bin/
 
-[ -z "$1" ] && echo "Usage: getbib [pdf] or getbib [doi]
-Requires pdfinfo if you are parsing a pdf" && exit
+[ -z "$1" ] && echo "Usage: getbib [pdf] or getbib [doi]" && exit 1
+
+if [[ -z "$BIB_PATH" ]]; then
+	echo "Enter the path to your ref.bib file:"
+	read BIB_PATH
+	export BIB_PATH
+fi
 
 if [ -f "$1" ]; then
-	if ![ -x "pdfinfo" ]; then 
+	if ! command -v pdfinfo &> /dev/null; then
 		echo "Error: pdfinfo not found." && exit 1
 	fi
 	# Extract the DOI and strip the "doi:" prefix if it exists
@@ -29,13 +34,23 @@ else
 fi
 
 # Check crossref.org for bibtex citation
-output=$(curl -X GET \
+echo "fetching DOI: $doi..."
+bib=$(curl -X GET \
 	"https://api.crossref.org/works/$doi/transform/application/x-bibtex" \
 	-H "User-Agent: dbarcene (mailto:david.barcene@utp.ac.pa)" \
 	-w "\\n")
 
-formatted="${output#?}"
-formatted="${formatted//,/,$'\n\t'}"
-formatted="${formatted%\}*}"$'\n}'
+bib="${bib#?}"
+bib="${bib//,/,$'\n\t'}"
+bib="${bib%\}*}"$'\n}'
+if [[ $bib =~ @[a-z]+\{([^,]+), ]]; then
+	inbetween="${BASH_REMATCH[1]}"
+fi
 
-echo "$formatted" | tee >> $BIB_PATH
+# match $bib first line with $inbetween
+if ! grep -qF $inbetween $BIB_PATH; then
+	echo "Added $inbetween to $BIB_PATH" 
+	echo "$bib" | tee >> $BIB_PATH
+else
+	echo "$inbetween is already in bibliography. Nothing done."
+fi
