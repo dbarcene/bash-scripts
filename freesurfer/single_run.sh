@@ -2,41 +2,40 @@
 # File              : single_run.sh
 # Author            : David Barcene <dbarcene@indicasat.org.pa>
 # Date              : 30.04.2026
-# Last Modified Date: 04.05.2026
+# Last Modified Date: 14.05.2026
 # Last Modified By  : David Barcene <dbarcene@indicasat.org.pa>
 # =============================================================================
 # Uso     : Editar las variables de la Sección 1 y lanzar con:
 #           sbatch single_run.sh
 # =============================================================================
 #SBATCH --job-name=freesurfer_single
-#SBATCH --output=/data/aberraondo/FS_LOGS/fs_%A_%a.out
-#SBATCH --error=/data/aberraondo/FS_LOGS/fs_%A_%a.err
+#SBATCH --output=/data/username/FS_LOGS/fs_%A_%a.out
+#SBATCH --error=/data/username/FS_LOGS/fs_%A_%a.err
 #SBATCH --nodes=1
 ##SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 
 # =============================================================================
-# SECCIÓN 1: VARIABLES DE ENTRADA — EDITAR ANTES DE LANZAR
+# SECCIÓN 1: CONFIGURACIÓN DEL ENTORNO
+# =============================================================================
+module purge
+module load freesurfer/8.1.0-1
+
+# =============================================================================
+# SECCIÓN 2: VARIABLES DE ENTRADA — EDITAR ANTES DE LANZAR
 # =============================================================================
 ID_PACIENTE="paciente006"
 VISITA="VISITA_1"
 ID_CASO="03-006"
 
 # Directorios base
-export SUBJECTS_DIR="/data/aberraondo/RESULTADOS"
+export SUBJECTS_DIR="/data/username/RESULTADOS"
 export FS_LICENSE="${FREESURFER_HOME}/license.txt"
-DICOM_BASE="/data/aberraondo/${VISITA}/${ID_CASO}/DICOM/00000001"
+DICOM_BASE="/data/username/${VISITA}/${ID_CASO}/DICOM/00000001"
 
 # Subdirectorios de secuencias (ajustar si dcmunpack muestra índices distintos)
 T1_DIR="${DICOM_BASE}/00000002"      # SAG3DMPRAGE
 FLAIR_DIR="${DICOM_BASE}/00000003"   # SAG3DFLAIR
-
-# =============================================================================
-# SECCIÓN 2: CONFIGURACIÓN DEL ENTORNO
-# =============================================================================
-module purge
-module load freesurfer/8.1.0-1
-
 
 # Verificar que el módulo haya definido FREESURFER_HOME
 if [ -z "${FREESURFER_HOME}" ]; then
